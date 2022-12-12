@@ -10,7 +10,7 @@ Our database is built using PSQL, and we will be interacting with it using node-
 
 After cloning the repo locally, you will need to create the necessary environment variables in order to complete the setup and to successfully connect to both the development and test databases locally.
 
-To do this, please create two `.env` files as follows:
+To do this, please create two `.env` files to the root of the directory, as follows:
 
 `.env.dev`
 
