@@ -33,3 +33,35 @@ describe("GET /api/categories", () => {
       });
   });
 });
+
+describe.only("GET /api/reviews", () => {
+  test("200: returns a reviews array of review objects, sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toBeSortedBy("created_at", { descending: true });
+        expect(reviews).toHaveLength(13);
+        reviews.forEach((review) => {
+          expect(review).toHaveProperty("owner");
+          expect(review).toHaveProperty("title");
+          expect(review).toHaveProperty("review_id");
+          expect(review).toHaveProperty("category");
+          expect(review).toHaveProperty("review_img_url");
+          expect(review).toHaveProperty("created_at");
+          expect(review).toHaveProperty("votes");
+          expect(review).toHaveProperty("designer");
+        });
+      });
+  });
+  test("200: each returned object has a comment_counts property, even if value is 0", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        reviews.forEach((review) => {
+          expect(review).toHaveProperty("comment_count");
+        });
+      });
+  });
+});
