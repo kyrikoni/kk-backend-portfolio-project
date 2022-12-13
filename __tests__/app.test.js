@@ -34,7 +34,7 @@ describe("GET /api/categories", () => {
   });
 });
 
-describe.only("GET /api/reviews", () => {
+describe("GET /api/reviews", () => {
   test("200: returns a reviews array of review objects, sorted by date in descending order", () => {
     return request(app)
       .get("/api/reviews")
@@ -62,6 +62,43 @@ describe.only("GET /api/reviews", () => {
         reviews.forEach((review) => {
           expect(review).toHaveProperty("comment_count");
         });
+      });
+  });
+});
+
+describe.only("GET /api/reviews/:review_id", () => {
+  test("200: returns an object of the specific review that matches the review_id", () => {
+    return request(app)
+      .get("/api/reviews/2")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.review).toMatchObject({
+          review_id: 2,
+          title: expect.any(String),
+          review_body: expect.any(String),
+          review_img_url: expect.any(String),
+          designer: expect.any(String),
+          votes: expect.any(Number),
+          category: expect.any(String),
+          owner: expect.any(String),
+          created_at: expect.any(String),
+        });
+      });
+  });
+  test("404: returns page not found when a review_id that doesn't exist is searched for", () => {
+    return request(app)
+      .get("/api/reviews/50")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("no user found");
+      });
+  });
+  test("400: returns bad request when an invalid review_id is searched for", () => {
+    return request(app)
+      .get("/api/reviews/banana")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
       });
   });
 });

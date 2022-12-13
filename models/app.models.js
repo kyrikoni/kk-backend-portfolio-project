@@ -20,3 +20,20 @@ exports.selectReviews = () => {
     return reviews.rows;
   });
 };
+
+exports.selectReviewById = (reviewId) => {
+  const reviewSQL = `
+  SELECT * FROM reviews
+  WHERE review_id = $1;
+  `;
+
+  return db.query(reviewSQL, [reviewId]).then((review) => {
+    if (!review.rows[0]) {
+      return Promise.reject({
+        status: 404,
+        msg: "no user found",
+      });
+    }
+    return review.rows[0];
+  });
+};
