@@ -37,3 +37,24 @@ exports.selectReviewById = (reviewId) => {
     return review.rows[0];
   });
 };
+
+exports.selectComments = (reviewId) => {
+  const commentSQL = `
+  SELECT comment_id, comments.votes, comments.created_at, author, body, comments.review_id 
+  FROM comments
+  JOIN reviews
+  ON comments.review_id = reviews.review_id
+  WHERE comments.review_id = $1
+  ORDER BY comments.created_at DESC
+  ;`;
+
+  return db.query(commentSQL, [reviewId]).then((comments) => {
+    if (!comments.rows[0]) {
+      return Promise.reject({
+        status: 404,
+        msg: "no user found",
+      });
+    }
+    return comments.rows;
+  });
+};

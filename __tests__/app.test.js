@@ -28,8 +28,8 @@ describe("GET /api/categories", () => {
     return request(app)
       .get("/api/categoriess")
       .expect(404)
-      .then((res) => {
-        expect(res.body.msg).toBe("path not found");
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("path not found");
       });
   });
 });
@@ -66,13 +66,13 @@ describe("GET /api/reviews", () => {
   });
 });
 
-describe.only("GET /api/reviews/:review_id", () => {
+describe("GET /api/reviews/:review_id", () => {
   test("200: returns an object of the specific review that matches the review_id", () => {
     return request(app)
       .get("/api/reviews/2")
       .expect(200)
-      .then((response) => {
-        expect(response.body.review).toMatchObject({
+      .then(({ body: { review } }) => {
+        expect(review).toMatchObject({
           review_id: 2,
           title: expect.any(String),
           review_body: expect.any(String),
@@ -89,16 +89,52 @@ describe.only("GET /api/reviews/:review_id", () => {
     return request(app)
       .get("/api/reviews/50")
       .expect(404)
-      .then((res) => {
-        expect(res.body.msg).toBe("no user found");
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("no user found");
       });
   });
   test("400: returns bad request when an invalid review_id is searched for", () => {
     return request(app)
       .get("/api/reviews/banana")
       .expect(400)
-      .then((res) => {
-        expect(res.body.msg).toBe("bad request");
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("bad request");
+      });
+  });
+});
+
+describe("GET /api/reviews/:review_id/comments", () => {
+  test("200: returns an array of comments for the given review_id, sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/reviews/3/comments")
+      .expect(200)
+      .then(({ body: { reviewComments } }) => {
+        expect(reviewComments).toBeSortedBy("created_at", { descending: true });
+        expect(reviewComments).toHaveLength(3);
+        reviewComments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("review_id");
+        });
+      });
+  });
+  test("404: returns page not found when a review_id that doesn't exist is searched for", () => {
+    return request(app)
+      .get("/api/reviews/50/comments")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("no user found");
+      });
+  });
+  test("400: returns bad request when an invalid review_id is searched for", () => {
+    return request(app)
+      .get("/api/reviews/banana/comments")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("bad request");
       });
   });
 });
