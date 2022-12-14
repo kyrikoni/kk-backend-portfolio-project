@@ -108,10 +108,10 @@ describe("GET /api/reviews/:review_id/comments", () => {
     return request(app)
       .get("/api/reviews/3/comments")
       .expect(200)
-      .then(({ body: { reviewComments } }) => {
-        expect(reviewComments).toBeSortedBy("created_at", { descending: true });
-        expect(reviewComments).toHaveLength(3);
-        reviewComments.forEach((comment) => {
+      .then(({ body: { comments } }) => {
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+        expect(comments).toHaveLength(3);
+        comments.forEach((comment) => {
           expect(comment).toHaveProperty("comment_id");
           expect(comment).toHaveProperty("votes");
           expect(comment).toHaveProperty("created_at");
@@ -121,12 +121,21 @@ describe("GET /api/reviews/:review_id/comments", () => {
         });
       });
   });
+  test("200: returns an empty array of comments for the given review_id where zero comments exist", () => {
+    return request(app)
+      .get("/api/reviews/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toHaveLength(0);
+        expect(comments).toEqual([]);
+      });
+  });
   test("404: returns page not found when a review_id that doesn't exist is searched for", () => {
     return request(app)
       .get("/api/reviews/50/comments")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("no user found");
+        expect(msg).toBe("no id found");
       });
   });
   test("400: returns bad request when an invalid review_id is searched for", () => {
