@@ -78,12 +78,6 @@ exports.insertComment = (newComment, reviewId) => {
   return db
     .query(insertCommentSQL, [username, body, reviewId])
     .then((comment) => {
-      if (!comment.rows[0]) {
-        return Promise.reject({
-          status: 404,
-          msg: "user not found",
-        });
-      }
       return comment.rows[0];
     });
 };

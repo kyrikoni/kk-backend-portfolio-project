@@ -166,28 +166,28 @@ describe("POST /api/reviews/:review_id/comments", () => {
         expect(comment).toHaveProperty("review_id");
       });
   });
-  test("404: returns page not found when a review_id that doesn't exist is searched for", () => {
+  test("404: returns id not found when a review_id that doesn't exist is searched for", () => {
     return request(app)
       .post("/api/reviews/50/comments")
       .send({
         username: "bainesface",
         body: "this is a test comment",
       })
-      .expect(400)
+      .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("bad request");
+        expect(msg).toBe("not found");
       });
   });
-  test("400: returns page not found when a username doesn't exist in the database", () => {
+  test("404: returns user not found when a username doesn't exist in the database", () => {
     return request(app)
       .post("/api/reviews/1/comments")
       .send({
         username: "kyri",
         body: "this is a test comment",
       })
-      .expect(400)
+      .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("bad request");
+        expect(msg).toBe("not found");
       });
   });
   test("400: returns bad request when an invalid review_id is searched for", () => {
