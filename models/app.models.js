@@ -37,3 +37,33 @@ exports.selectReviewById = (reviewId) => {
     return review.rows[0];
   });
 };
+
+exports.checkReviewIdExists = (reviewId) => {
+  const checkIdSQL = `
+  SELECT * FROM reviews
+  WHERE review_id = $1
+  ;`;
+
+  return db.query(checkIdSQL, [reviewId]).then((review) => {
+    if (review.rowCount === 0) {
+      return Promise.reject({
+        status: 404,
+        msg: "no id found",
+      });
+    } else {
+      return Promise.resolve();
+    }
+  });
+};
+
+exports.selectComments = (reviewId) => {
+  const commentSQL = `
+  SELECT * FROM comments
+  WHERE review_id = $1
+  ORDER BY created_at DESC
+  ;`;
+
+  return db.query(commentSQL, [reviewId]).then((comments) => {
+    return comments.rows;
+  });
+};
