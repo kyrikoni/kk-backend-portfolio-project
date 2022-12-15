@@ -173,9 +173,9 @@ describe("POST /api/reviews/:review_id/comments", () => {
         username: "bainesface",
         body: "this is a test comment",
       })
-      .expect(404)
+      .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("no id found");
+        expect(msg).toBe("bad request");
       });
   });
   test("400: returns page not found when a username doesn't exist in the database", () => {
