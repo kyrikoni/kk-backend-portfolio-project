@@ -90,7 +90,7 @@ describe("GET /api/reviews/:review_id", () => {
       .get("/api/reviews/50")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("no user found");
+        expect(msg).toBe("no id found");
       });
   });
   test("400: returns bad request when an invalid review_id is searched for", () => {
@@ -141,6 +141,73 @@ describe("GET /api/reviews/:review_id/comments", () => {
   test("400: returns bad request when an invalid review_id is searched for", () => {
     return request(app)
       .get("/api/reviews/banana/comments")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("bad request");
+      });
+  });
+});
+
+describe("POST /api/reviews/:review_id/comments", () => {
+  test("201: returns a successful post after passing a comment request on a valid review_id", () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send({
+        username: "bainesface",
+        body: "this is a test comment",
+      })
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment).toHaveProperty("comment_id");
+        expect(comment).toHaveProperty("votes");
+        expect(comment).toHaveProperty("created_at");
+        expect(comment).toHaveProperty("author");
+        expect(comment).toHaveProperty("body");
+        expect(comment).toHaveProperty("review_id");
+      });
+  });
+  test("404: returns id not found when a review_id that doesn't exist is searched for", () => {
+    return request(app)
+      .post("/api/reviews/50/comments")
+      .send({
+        username: "bainesface",
+        body: "this is a test comment",
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("not found");
+      });
+  });
+  test("404: returns user not found when a username doesn't exist in the database", () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send({
+        username: "kyri",
+        body: "this is a test comment",
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("not found");
+      });
+  });
+  test("400: returns bad request when an invalid review_id is searched for", () => {
+    return request(app)
+      .post("/api/reviews/banana/comments")
+      .send({
+        username: "bainesface",
+        body: "this is a test comment",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("bad request");
+      });
+  });
+  test("400: returns bad request when a request with missing information is sent", () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send({
+        body: "this is a test comment",
+      })
       .expect(400)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("bad request");

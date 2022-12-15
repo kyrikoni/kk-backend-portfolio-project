@@ -31,7 +31,7 @@ exports.selectReviewById = (reviewId) => {
     if (!review.rows[0]) {
       return Promise.reject({
         status: 404,
-        msg: "no user found",
+        msg: "no id found",
       });
     }
     return review.rows[0];
@@ -66,4 +66,18 @@ exports.selectComments = (reviewId) => {
   return db.query(commentSQL, [reviewId]).then((comments) => {
     return comments.rows;
   });
+};
+
+exports.insertComment = (newComment, reviewId) => {
+  const { username, body } = newComment;
+  const insertCommentSQL = `
+  INSERT INTO comments (author, body, review_id) VALUES ($1, $2, $3)
+  RETURNING *
+  ;`;
+
+  return db
+    .query(insertCommentSQL, [username, body, reviewId])
+    .then((comment) => {
+      return comment.rows[0];
+    });
 };
