@@ -102,3 +102,7 @@ describe.only("GET /api/reviews/:review_id", () => {
       });
   });
 });
+
+describe("POST /api/reviews/:review_id/comments", () => {
+  test("200: returns a successful post after passing a comment request on a valid review_id", () => {});
+});

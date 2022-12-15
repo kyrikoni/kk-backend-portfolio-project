@@ -4,6 +4,7 @@ const {
   getCategories,
   getReviews,
   getReviewById,
+  postCommentByReviewId,
 } = require("./controllers/app.controllers");
 const {
   handle404Paths,
@@ -19,6 +20,8 @@ app.get("/api/categories", getCategories);
 
 app.get("/api/reviews", getReviews);
 app.get("/api/reviews/:review_id", getReviewById);
+
+app.post("/api/reviews/:review_id/comments", postCommentByReviewId);
 
 app.all("*", handle404Paths);
 

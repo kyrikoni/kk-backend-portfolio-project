@@ -34,3 +34,5 @@ exports.getReviewById = (req, res, next) => {
       next(err);
     });
 };
+
+exports.postCommentByReviewId = (req, res, next) => {};
