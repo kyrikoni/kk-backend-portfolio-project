@@ -2,6 +2,9 @@ const {
   selectCategories,
   selectReviews,
   selectReviewById,
+  checkReviewIdExists,
+  selectComments,
+  insertComment,
 } = require("../models/app.models");
 
 exports.getCategories = (req, res, next) => {
@@ -35,4 +38,27 @@ exports.getReviewById = (req, res, next) => {
     });
 };
 
-exports.postCommentByReviewId = (req, res, next) => {};
+exports.getCommentsByReviewId = (req, res, next) => {
+  const reviewId = req.params.review_id;
+  Promise.all([checkReviewIdExists(reviewId), selectComments(reviewId)])
+    .then((reviewComments) => {
+      res.status(200).send({ comments: reviewComments[1] });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postCommentByReviewId = (req, res, next) => {
+  const reviewId = req.params.review_id;
+  Promise.all([
+    checkReviewIdExists(reviewId),
+    insertComment(req.body, reviewId),
+  ])
+    .then((newComment) => {
+      res.status(201).send({ comment: newComment[1] });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
