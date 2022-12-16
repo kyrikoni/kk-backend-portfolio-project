@@ -73,9 +73,13 @@ exports.selectReviews = (category, sort_by = "created_at", order = "desc") => {
 
 exports.selectReviewById = (reviewId) => {
   const reviewSQL = `
-  SELECT * FROM reviews
-  WHERE review_id = $1;
-  `;
+  SELECT owner, title, review_body, reviews.review_id, category, review_img_url, reviews.created_at, reviews.votes, designer, COUNT(comments.review_id) AS comment_count
+  FROM reviews
+  LEFT JOIN comments
+  ON reviews.review_id = comments.review_id
+  WHERE reviews.review_id = $1
+  GROUP BY reviews.review_id
+  ;`;
 
   return db.query(reviewSQL, [reviewId]).then((review) => {
     if (!review.rows[0]) {

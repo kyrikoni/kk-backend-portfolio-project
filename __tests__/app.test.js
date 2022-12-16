@@ -414,3 +414,15 @@ describe("GET /api/reviews (queries)", () => {
       });
   });
 });
+
+describe("GET /api/reviews/:review_id (comment count)", () => {
+  test("200: returns a review object which includes comment_count as a column", () => {
+    return request(app)
+      .get("/api/reviews/2")
+      .expect(200)
+      .then(({ body: { review } }) => {
+        console.log(review);
+        expect(review).toHaveProperty("comment_count");
+      });
+  });
+});
