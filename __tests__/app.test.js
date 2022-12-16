@@ -433,3 +433,30 @@ describe("GET /api/reviews/:review_id (comment count)", () => {
       });
   });
 });
+
+describe.only("DELETE /api/comments/:comment_id", () => {
+  test("204: returns no content after removing the comment by comment_id", () => {
+    return request(app)
+      .delete("/api/comments/5")
+      .expect(204)
+      .then((res) => {
+        expect(res.noContent).toBe(true);
+      });
+  });
+  test("404: returns id not found when a review_id that doesn't exist is searched for", () => {
+    return request(app)
+      .delete("/api/comments/20")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("no comment found");
+      });
+  });
+  test("400: returns a bad request when an invalid id is searched to delete", () => {
+    return request(app)
+      .delete("/api/comments/banana")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("bad request");
+      });
+  });
+});
