@@ -215,7 +215,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
   });
 });
 
-describe.only("PATCH /api/reviews/:review_id", () => {
+describe("PATCH /api/reviews/:review_id", () => {
   test("200: returns the updated review after passing a patch request to update the vote count positively on a valid review_id", () => {
     return request(app)
       .patch("/api/reviews/2")
@@ -225,15 +225,19 @@ describe.only("PATCH /api/reviews/:review_id", () => {
       .expect(200)
       .then(({ body: { comment } }) => {
         expect(comment.votes).toBe(10);
-        expect(comment).toHaveProperty("review_id");
-        expect(comment).toHaveProperty("title");
-        expect(comment).toHaveProperty("category");
-        expect(comment).toHaveProperty("designer");
-        expect(comment).toHaveProperty("owner");
-        expect(comment).toHaveProperty("review_body");
-        expect(comment).toHaveProperty("review_img_url");
-        expect(comment).toHaveProperty("created_at");
-        expect(comment).toHaveProperty("votes");
+        expect(comment).toEqual(
+          expect.objectContaining({
+            review_id: expect.any(Number),
+            title: expect.any(String),
+            category: expect.any(String),
+            designer: expect.any(String),
+            owner: expect.any(String),
+            review_body: expect.any(String),
+            review_img_url: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+          })
+        );
       });
   });
   test("200: returns the updated review after passing a patch request to update the vote count negatively on a valid review_id", () => {
