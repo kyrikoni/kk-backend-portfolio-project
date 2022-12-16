@@ -7,6 +7,7 @@ const {
   selectComments,
   insertComment,
   updateReview,
+  deleteComment,
 } = require("../models/app.models");
 
 exports.getCategories = (req, res, next) => {
@@ -77,6 +78,17 @@ exports.patchReviewById = (req, res, next) => {
   updateReview(req.body, reviewId)
     .then((updatedComment) => {
       res.status(200).send({ comment: updatedComment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.deleteCommentById = (req, res, next) => {
+  const commentId = req.params.comment_id;
+  deleteComment(commentId)
+    .then((comment) => {
+      res.status(204).send({ comment });
     })
     .catch((err) => {
       next(err);

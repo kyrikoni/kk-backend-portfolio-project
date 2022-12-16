@@ -167,3 +167,20 @@ exports.updateReview = (updateRequest, reviewId) => {
     return review.rows[0];
   });
 };
+
+exports.deleteComment = (commentId) => {
+  const deleteCommentSQL = `
+  DELETE FROM comments
+  WHERE comment_id = $1
+  ;`;
+
+  return db.query(deleteCommentSQL, [commentId]).then((comment) => {
+    if (comment.rowCount === 0) {
+      return Promise.reject({
+        status: 404,
+        msg: "no comment found",
+      });
+    }
+    return comment.rows;
+  });
+};
