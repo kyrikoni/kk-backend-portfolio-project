@@ -2,6 +2,7 @@ const {
   selectCategories,
   selectReviews,
   selectReviewById,
+  selectUser,
   checkReviewIdExists,
   selectComments,
   insertComment,
@@ -44,6 +45,16 @@ exports.getCommentsByReviewId = (req, res, next) => {
   Promise.all([checkReviewIdExists(reviewId), selectComments(reviewId)])
     .then((reviewComments) => {
       res.status(200).send({ comments: reviewComments[1] });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getUsers = (req, res, next) => {
+  selectUser()
+    .then((users) => {
+      res.status(200).send({ users });
     })
     .catch((err) => {
       next(err);
