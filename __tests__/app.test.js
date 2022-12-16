@@ -434,7 +434,7 @@ describe("GET /api/reviews/:review_id (comment count)", () => {
   });
 });
 
-describe("DELETE /api/comments/:comment_id", () => {
+describe.only("DELETE /api/comments/:comment_id", () => {
   test("204: returns no content after removing the comment by comment_id", () => {
     return request(app)
       .delete("/api/comments/5")

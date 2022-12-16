@@ -181,6 +181,5 @@ exports.deleteComment = (commentId) => {
         msg: "no comment found",
       });
     }
-    return comment.rows;
   });
 };

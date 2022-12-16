@@ -87,8 +87,8 @@ exports.patchReviewById = (req, res, next) => {
 exports.deleteCommentById = (req, res, next) => {
   const commentId = req.params.comment_id;
   deleteComment(commentId)
-    .then((comment) => {
-      res.status(204).send({ comment });
+    .then(() => {
+      res.sendStatus(204);
     })
     .catch((err) => {
       next(err);
