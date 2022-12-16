@@ -414,3 +414,22 @@ describe("GET /api/reviews (queries)", () => {
       });
   });
 });
+
+describe("GET /api/reviews/:review_id (comment count)", () => {
+  test("200: returns a review object which includes comment_count as a column", () => {
+    return request(app)
+      .get("/api/reviews/2")
+      .expect(200)
+      .then(({ body: { review } }) => {
+        expect(review).toHaveProperty("comment_count");
+      });
+  });
+  test("200: returns a comment_count of 0 when zero comments have been made to a review", () => {
+    return request(app)
+      .get("/api/reviews/1")
+      .expect(200)
+      .then(({ body: { review } }) => {
+        expect(review.comment_count).toBe("0");
+      });
+  });
+});
