@@ -68,6 +68,13 @@ exports.selectComments = (reviewId) => {
   });
 };
 
+exports.selectUser = () => {
+  const usersSQL = "SELECT * FROM users;";
+  return db.query(usersSQL).then((users) => {
+    return users.rows;
+  });
+};
+
 exports.insertComment = (newComment, reviewId) => {
   const { username, body } = newComment;
   const insertCommentSQL = `

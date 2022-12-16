@@ -294,3 +294,31 @@ describe("PATCH /api/reviews/:review_id", () => {
       });
   });
 });
+
+describe("GET /api/users", () => {
+  test("200: returns an array of user objects, each of which has a username, name and avatar_url", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body: { users } }) => {
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+  test("404: returns page not found when passed an incorrect endpoint", () => {
+    return request(app)
+      .get("/api/userss")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("path not found");
+      });
+  });
+});
