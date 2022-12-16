@@ -5,6 +5,7 @@ const {
   checkReviewIdExists,
   selectComments,
   insertComment,
+  updateReview,
 } = require("../models/app.models");
 
 exports.getCategories = (req, res, next) => {
@@ -54,6 +55,17 @@ exports.postCommentByReviewId = (req, res, next) => {
   insertComment(req.body, reviewId)
     .then((newComment) => {
       res.status(201).send({ comment: newComment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.patchReviewById = (req, res, next) => {
+  const reviewId = req.params.review_id;
+  updateReview(req.body, reviewId)
+    .then((updatedComment) => {
+      res.status(200).send({ comment: updatedComment });
     })
     .catch((err) => {
       next(err);

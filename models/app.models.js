@@ -81,3 +81,28 @@ exports.insertComment = (newComment, reviewId) => {
       return comment.rows[0];
     });
 };
+
+exports.updateReview = (updateRequest, reviewId) => {
+  const { inc_votes } = updateRequest;
+  const updateReviewSQL = `
+  UPDATE reviews
+  SET votes = (votes + $1)
+  WHERE review_id = $2
+  RETURNING *
+  ;`;
+
+  return db.query(updateReviewSQL, [inc_votes, reviewId]).then((review) => {
+    if (review.rows[0] === undefined) {
+      return Promise.reject({
+        status: 404,
+        msg: "no id found",
+      });
+    } else if (review.rows[0].votes < 0) {
+      return Promise.reject({
+        status: 400,
+        msg: "total votes cannot be less than 0",
+      });
+    }
+    return review.rows[0];
+  });
+};
