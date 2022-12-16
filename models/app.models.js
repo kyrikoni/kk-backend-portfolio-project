@@ -8,47 +8,66 @@ exports.selectCategories = () => {
 };
 
 exports.selectReviews = (category, sort_by = "created_at", order = "desc") => {
-  const validSortByColumns = [
-    "owner",
-    "title",
-    "review_id",
-    "category",
-    "created_at",
-    "votes",
-    "designer",
-  ];
+  const checkCategorySQL = `
+  SELECT * FROM categories
+  ;`;
 
-  if (!validSortByColumns.includes(sort_by)) {
-    return Promise.reject({
-      status: 400,
-      msg: "bad request",
+  return db.query(checkCategorySQL).then((listOfCategories) => {
+    const slugArr = [];
+
+    listOfCategories.rows.map((category) => {
+      slugArr.push(category.slug);
     });
-  }
-  const validOrders = ["asc", "desc"];
 
-  if (!validOrders.includes(order)) {
-    return Promise.reject({
-      status: 400,
-      msg: "bad request",
-    });
-  }
+    if (!slugArr.includes(category) && category !== undefined) {
+      return Promise.reject({
+        status: 404,
+        msg: "no category found",
+      });
+    }
 
-  let reviewsSQL = `
+    const validSortByColumns = [
+      "owner",
+      "title",
+      "review_id",
+      "category",
+      "created_at",
+      "votes",
+      "designer",
+    ];
+
+    if (!validSortByColumns.includes(sort_by)) {
+      return Promise.reject({
+        status: 400,
+        msg: "bad request",
+      });
+    }
+    const validOrders = ["asc", "desc"];
+
+    if (!validOrders.includes(order)) {
+      return Promise.reject({
+        status: 400,
+        msg: "bad request",
+      });
+    }
+
+    let reviewsSQL = `
   SELECT owner, title, reviews.review_id, category, review_img_url, reviews.created_at, reviews.votes, designer, COUNT(comments.review_id) AS comment_count
   FROM reviews
   LEFT JOIN comments
   ON reviews.review_id = comments.review_id`;
 
-  if (category) reviewsSQL += ` WHERE category = $1`;
+    if (category) reviewsSQL += ` WHERE category = $1`;
 
-  reviewsSQL += ` GROUP BY reviews.review_id
+    reviewsSQL += ` GROUP BY reviews.review_id
   ORDER BY ${sort_by} ${order}
   ;`;
 
-  const queryArgs = category ? [reviewsSQL, [category]] : [reviewsSQL];
+    const queryArgs = category ? [reviewsSQL, [category]] : [reviewsSQL];
 
-  return db.query(...queryArgs).then((reviews) => {
-    return reviews.rows;
+    return db.query(...queryArgs).then((reviews) => {
+      return reviews.rows;
+    });
   });
 };
 

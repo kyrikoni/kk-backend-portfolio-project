@@ -365,6 +365,14 @@ describe("GET /api/reviews (queries)", () => {
         expect(reviews).toBeSortedBy("review_id", { descending: true });
       });
   });
+  test("200: returns an empty array where the category is valid but it has no reviews", () => {
+    return request(app)
+      .get("/api/reviews?category=children's games")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toEqual([]);
+      });
+  });
   test("400: returns a bad request when user tries to sort the query with an invalid column", () => {
     return request(app)
       .get("/api/reviews?sort_by=review_img_url")
@@ -395,6 +403,14 @@ describe("GET /api/reviews (queries)", () => {
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe("bad request");
+      });
+  });
+  test("404: returns a page not found when a category that doesn't exist is queried", () => {
+    return request(app)
+      .get("/api/reviews?category=bananas")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("no category found");
       });
   });
 });
