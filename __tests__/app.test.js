@@ -214,3 +214,79 @@ describe("POST /api/reviews/:review_id/comments", () => {
       });
   });
 });
+
+describe.only("PATCH /api/reviews/:review_id", () => {
+  test("200: returns the updated review after passing a patch request to update the vote count positively on a valid review_id", () => {
+    return request(app)
+      .patch("/api/reviews/2")
+      .send({
+        inc_votes: 5,
+      })
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        expect(comment.votes).toBe(10);
+        expect(comment).toHaveProperty("review_id");
+        expect(comment).toHaveProperty("title");
+        expect(comment).toHaveProperty("category");
+        expect(comment).toHaveProperty("designer");
+        expect(comment).toHaveProperty("owner");
+        expect(comment).toHaveProperty("review_body");
+        expect(comment).toHaveProperty("review_img_url");
+        expect(comment).toHaveProperty("created_at");
+        expect(comment).toHaveProperty("votes");
+      });
+  });
+  test("200: returns the updated review after passing a patch request to update the vote count negatively on a valid review_id", () => {
+    return request(app)
+      .patch("/api/reviews/2")
+      .send({
+        inc_votes: -5,
+      })
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        expect(comment.votes).toBe(0);
+      });
+  });
+  test("400: returns a bad request as total votes cannot be less than 0", () => {
+    return request(app)
+      .patch("/api/reviews/2")
+      .send({
+        inc_votes: -10,
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("total votes cannot be less than 0");
+      });
+  });
+  test("404: returns id not found when a review_id that doesn't exist is searched for", () => {
+    return request(app)
+      .patch("/api/reviews/50")
+      .send({
+        inc_votes: -5,
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("no id found");
+      });
+  });
+  test("400: returns a bad request when a request has an incorrect data type", () => {
+    return request(app)
+      .patch("/api/reviews/2")
+      .send({
+        inc_votes: "banana",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("bad request");
+      });
+  });
+  test("400: returns a bad request when a request has a missing required field / malformed body", () => {
+    return request(app)
+      .patch("/api/reviews/2")
+      .send({})
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("bad request");
+      });
+  });
+});
