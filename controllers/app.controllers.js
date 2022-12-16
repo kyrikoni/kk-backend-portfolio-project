@@ -20,7 +20,7 @@ exports.getCategories = (req, res, next) => {
 };
 
 exports.getReviews = (req, res, next) => {
-  selectReviews()
+  selectReviews(req.query.category, req.query.sort_by, req.query.order)
     .then((reviews) => {
       res.status(200).send({ reviews });
     })
