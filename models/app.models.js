@@ -7,16 +7,47 @@ exports.selectCategories = () => {
   });
 };
 
-exports.selectReviews = () => {
-  const reviewsSQL = `
+exports.selectReviews = (category, sort_by = "created_at", order = "desc") => {
+  const validSortByColumns = [
+    "owner",
+    "title",
+    "review_id",
+    "category",
+    "created_at",
+    "votes",
+    "designer",
+  ];
+
+  if (!validSortByColumns.includes(sort_by)) {
+    return Promise.reject({
+      status: 400,
+      msg: "bad request",
+    });
+  }
+  const validOrders = ["asc", "desc"];
+
+  if (!validOrders.includes(order)) {
+    return Promise.reject({
+      status: 400,
+      msg: "bad request",
+    });
+  }
+
+  let reviewsSQL = `
   SELECT owner, title, reviews.review_id, category, review_img_url, reviews.created_at, reviews.votes, designer, COUNT(comments.review_id) AS comment_count
   FROM reviews
   LEFT JOIN comments
-  ON reviews.review_id = comments.review_id
-  GROUP BY reviews.review_id
-  ORDER BY reviews.created_at DESC
+  ON reviews.review_id = comments.review_id`;
+
+  if (category) reviewsSQL += ` WHERE category = $1`;
+
+  reviewsSQL += ` GROUP BY reviews.review_id
+  ORDER BY ${sort_by} ${order}
   ;`;
-  return db.query(reviewsSQL).then((reviews) => {
+
+  const queryArgs = category ? [reviewsSQL, [category]] : [reviewsSQL];
+
+  return db.query(...queryArgs).then((reviews) => {
     return reviews.rows;
   });
 };

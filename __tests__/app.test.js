@@ -3,6 +3,7 @@ const db = require("../db/connection");
 const request = require("supertest");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
+const { get } = require("../app");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -319,6 +320,81 @@ describe("GET /api/users", () => {
       .expect(404)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("path not found");
+      });
+  });
+});
+
+describe("GET /api/reviews (queries)", () => {
+  test("200: returns an array of review objects where the order defaults to descending and the sort by category is created_at", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("200: returns an array of review objects a query of a specific category is searched for", () => {
+    return request(app)
+      .get("/api/reviews?category=dexterity")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toHaveLength(1);
+        expect(reviews[0].category).toBe("dexterity");
+      });
+  });
+  test("200: returns an array of review objects which is sorted by the specified sort_by column in the query", () => {
+    return request(app)
+      .get("/api/reviews/?sort_by=votes")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toBeSortedBy("votes", { descending: true });
+      });
+  });
+  test("200: returns an array of review objects which is ordered in the specified way as per the query", () => {
+    return request(app)
+      .get("/api/reviews/?order=asc")
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toBeSortedBy("created_at", { ascending: true });
+      });
+  });
+  test("200: sort_by and order queries work in conjunction", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=review_id&order=desc")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toBeSortedBy("review_id", { descending: true });
+      });
+  });
+  test("400: returns a bad request when user tries to sort the query with an invalid column", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=review_img_url")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("bad request");
+      });
+  });
+  test("400: returns a bad request when an order query is entered incorrectly", () => {
+    return request(app)
+      .get("/api/reviews?order=new")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("bad request");
+      });
+  });
+  test("400: returns bad request when sort_by is entered incorrectly", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("bad request");
+      });
+  });
+  test("400: returns a bad request when queries are used in conjunction and one of them is used incorrectly", () => {
+    return request(app)
+      .get("/api/reviews?order=new&sort_by=category")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("bad request");
       });
   });
 });
