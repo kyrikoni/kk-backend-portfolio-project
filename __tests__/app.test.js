@@ -460,3 +460,12 @@ describe("DELETE /api/comments/:comment_id", () => {
       });
   });
 });
+
+describe.only("GET /api", () => {
+  test("200: returns endpoint.json file describing all available endpoints on my API", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((endpointJSON) => {});
+  });
+});

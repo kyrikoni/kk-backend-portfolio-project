@@ -76,8 +76,8 @@ exports.postCommentByReviewId = (req, res, next) => {
 exports.patchReviewById = (req, res, next) => {
   const reviewId = req.params.review_id;
   updateReview(req.body, reviewId)
-    .then((updatedComment) => {
-      res.status(200).send({ comment: updatedComment });
+    .then((updatedReview) => {
+      res.status(200).send({ review: updatedReview });
     })
     .catch((err) => {
       next(err);
