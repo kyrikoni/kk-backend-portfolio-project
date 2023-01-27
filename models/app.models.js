@@ -158,11 +158,6 @@ exports.updateReview = (updateRequest, reviewId) => {
         status: 404,
         msg: "no id found",
       });
-    } else if (review.rows[0].votes < 0) {
-      return Promise.reject({
-        status: 400,
-        msg: "total votes cannot be less than 0",
-      });
     }
     return review.rows[0];
   });

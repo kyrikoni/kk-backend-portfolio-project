@@ -1,7 +1,9 @@
 const express = require("express");
 const cors = require("cors");
+const fs = require("fs/promises");
 
 const {
+  getEndpoints,
   getCategories,
   getReviews,
   getReviewById,
@@ -21,6 +23,8 @@ const {
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+app.get("/api", getEndpoints);
 
 app.get("/api/categories", getCategories);
 

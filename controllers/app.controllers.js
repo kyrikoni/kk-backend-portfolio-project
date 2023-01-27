@@ -1,3 +1,5 @@
+const fs = require("fs/promises");
+
 const {
   selectCategories,
   selectReviews,
@@ -9,6 +11,12 @@ const {
   updateReview,
   deleteComment,
 } = require("../models/app.models");
+
+exports.getEndpoints = (request, response, next) => {
+  fs.readFile(__dirname + "/../endpoints.json", "utf8").then((endpoints) =>
+    response.status(200).send({ endpoints: JSON.parse(endpoints) })
+  );
+};
 
 exports.getCategories = (req, res, next) => {
   selectCategories()

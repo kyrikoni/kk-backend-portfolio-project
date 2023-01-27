@@ -252,17 +252,6 @@ describe("PATCH /api/reviews/:review_id", () => {
         expect(comment.votes).toBe(0);
       });
   });
-  test("400: returns a bad request as total votes cannot be less than 0", () => {
-    return request(app)
-      .patch("/api/reviews/2")
-      .send({
-        inc_votes: -10,
-      })
-      .expect(400)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("total votes cannot be less than 0");
-      });
-  });
   test("404: returns id not found when a review_id that doesn't exist is searched for", () => {
     return request(app)
       .patch("/api/reviews/50")
@@ -458,14 +447,5 @@ describe("DELETE /api/comments/:comment_id", () => {
       .then(({ body: { msg } }) => {
         expect(msg).toBe("bad request");
       });
-  });
-});
-
-describe.only("GET /api", () => {
-  test("200: returns endpoint.json file describing all available endpoints on my API", () => {
-    return request(app)
-      .get("/api")
-      .expect(200)
-      .then((endpointJSON) => {});
   });
 });
