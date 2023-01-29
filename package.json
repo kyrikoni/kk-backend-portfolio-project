@@ -42,5 +42,10 @@
       "jest-extended/all",
       "jest-sorted"
     ]
+  },
+  "engines": {
+    "node": "<=19.0.0",
+    "npm": "<=8.19.2",
+    "psql": "<=14.6"
   }
 }
